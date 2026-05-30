@@ -1,0 +1,46 @@
+name: Deploy to Dev Server
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      name:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: 'Deployment to Dev Server'
+        # Default value if no value is explicitly provided
+        default: 'Deployment to Dev Server'
+        # Input has to be provided for the workflow to run
+        required: true
+        # The data type of the input
+        type: string # Deploy on push to main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install sshpass
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+      - name: Deploy to Server
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+        run: |
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USERNAME@137.59.53.70 -p 21458 << 'EOF'
+            cd /root/acdoctorserver/acdoctorserverapp
+            git pull origin master
+            pwd
+            export NVM_DIR=/root/.nvm
+            source /root/.nvm/nvm.sh
+            npm install
+            npm run stop:server
+            npm run start:server
+          EOF

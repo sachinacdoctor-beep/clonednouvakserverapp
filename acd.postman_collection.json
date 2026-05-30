@@ -1,0 +1,1878 @@
+{
+	"info": {
+		"_postman_id": "b23f5a4b-f028-4d27-9b35-22ded4073854",
+		"name": "AC Doctor",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40749977"
+	},
+	"item": [
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Tools",
+					"item": [
+						{
+							"name": "Create Tool",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Drill Machine\",\n    \"description\": \"Battery Operated machin\",\n    \"image\": \"fdsaf\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1//admin/tools/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"",
+										"admin",
+										"tools",
+										"create"
+									],
+									"query": [
+										{
+											"key": "toolId",
+											"value": "6829c2e1d804d7437905f402",
+											"disabled": true
+										},
+										{
+											"key": "sortby",
+											"value": "createdAt",
+											"disabled": true
+										},
+										{
+											"key": "orderby",
+											"value": "desc",
+											"disabled": true
+										},
+										{
+											"key": "startDate",
+											"value": "2024-12-20",
+											"disabled": true
+										},
+										{
+											"key": "endDate",
+											"value": "2024-12-25",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Tools",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"big hammer\",\n    \"description\": \"Hammer\",\n    \"image\": \"https://image.jpg\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1//admin/tools/list?page=0&limit=20",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"",
+										"admin",
+										"tools",
+										"list"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										},
+										{
+											"key": "search",
+											"value": "big",
+											"disabled": true
+										},
+										{
+											"key": "startDate",
+											"value": "2024-12-20",
+											"disabled": true
+										},
+										{
+											"key": "endDate",
+											"value": "2024-12-25",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Soft Delete Tool",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/tools/delete/688603e3d260552a80180b25",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"tools",
+										"delete",
+										"688603e3d260552a80180b25"
+									],
+									"query": [
+										{
+											"key": "toolId",
+											"value": "6829c2e1d804d7437905f402",
+											"disabled": true
+										},
+										{
+											"key": "sortby",
+											"value": "createdAt",
+											"disabled": true
+										},
+										{
+											"key": "orderby",
+											"value": "desc",
+											"disabled": true
+										},
+										{
+											"key": "startDate",
+											"value": "2024-12-20",
+											"disabled": true
+										},
+										{
+											"key": "endDate",
+											"value": "2024-12-25",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Tool",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"toolId\": \"688603f4d260552a80180b29\",\n    \"image\": \"Solid Steel Wrench\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/tools/edit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"tools",
+										"edit"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "User",
+					"item": [
+						{
+							"name": "User List",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/user/list?page=1&limit=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										},
+										{
+											"key": "search",
+											"value": "John",
+											"disabled": true
+										},
+										{
+											"key": "sortby",
+											"value": "createdAt",
+											"disabled": true
+										},
+										{
+											"key": "orderby",
+											"value": "desc",
+											"disabled": true
+										},
+										{
+											"key": "startDate",
+											"value": "2024-12-20",
+											"disabled": true
+										},
+										{
+											"key": "endDate",
+											"value": "2024-12-25",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User Details",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \n    \"phoneNumber\": \"7000762505\",\n    \"countryCode\": \"+91\",\n    \"userName\": \"surajj\", \n    \"type\": \"HNI\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/user/677e60fa2fd68874ecfab3eb",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"user",
+										"677e60fa2fd68874ecfab3eb"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add User",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \n    \"phoneNumber\": \"7000762509\",\n    \"userId\": \"67812183fa538f1776afeb90\",\n    \"countryCode\": \"+91\",\n    \"userName\": \"surajj2\", \n    \"type\": \"HNI\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.acdoctor.in/api/v1/admin/user/add-edit",
+									"protocol": "https",
+									"host": [
+										"api",
+										"acdoctor",
+										"in"
+									],
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"user",
+										"add-edit"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Technician",
+					"item": [
+						{
+							"name": "Add Technician",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"John Doe 66\",\n    \"countryCode\": \"91\",\n    \"phoneNumber\": \"1234567896\",\n    \"joiningDate\": \"2025-01-01\",\n    \"profilePhoto\": \"https://example.com/profile2.jpg\",\n    \"type\": \"FC\",\n    \"email\": \"john.doe1@example.com\",\n    \"secondaryContactNumber\": \"3213213212\",\n    \"dob\": \"1990-01-01\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/technician/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"technician",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit Technician",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"technicianId\": \"678514476b406713936d29cd\",\n    \"name\": \"John Doe 3\",\n    \"countryCode\": \"91\",\n    \"phoneNumber\": \"1234567890\",\n    \"joiningDate\": \"2023-01-01\",\n    \"profileImage\": \"https://example.com/profile.jpg\",\n    \"kycStatus\": \"VERIFIED\",\n    \"type\": \"ACD\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/technician/edit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"technician",
+										"edit"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Technician By id",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/technician/6900325a69f16e4700d8aa18",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"technician",
+										"6900325a69f16e4700d8aa18"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List AVAILABLE Technicians",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/technician/list/available",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"technician",
+										"list",
+										"available"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Technician KYC Management",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"type\": \"PAN\",\n    \"comment\": \"XYZ\",\n    \"docUrl\": \"https://anc.com\" \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/technician/kyc/manage/678514476b406713936d29cd",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"technician",
+										"kyc",
+										"manage",
+										"678514476b406713936d29cd"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Technician List",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/technician/list?page=1&limit=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"technician",
+										"list"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										},
+										{
+											"key": "search",
+											"value": "JohnFC",
+											"disabled": true
+										},
+										{
+											"key": "type",
+											"value": "FC",
+											"disabled": true
+										},
+										{
+											"key": "position",
+											"value": "HELPER",
+											"disabled": true
+										},
+										{
+											"key": "status",
+											"value": "AVAILABLE",
+											"disabled": true
+										},
+										{
+											"key": "kycStatus",
+											"value": "PENDING",
+											"disabled": true
+										},
+										{
+											"key": "sortby",
+											"value": "createdAt",
+											"disabled": true
+										},
+										{
+											"key": "orderby",
+											"value": "desc",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle Technician Status",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/technician/status?technicianId=678a02cff58f4fa7e2c264ae",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"technician",
+										"status"
+									],
+									"query": [
+										{
+											"key": "technicianId",
+											"value": "678a02cff58f4fa7e2c264ae"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Activate/Deactivate Technician",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/technician/active-inactive/678514476b406713936d29cd",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"technician",
+										"active-inactive",
+										"678514476b406713936d29cd"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change KYC Status",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"technicianId\": \"6900325a69f16e4700d8aa18\",\n    \"action\": \"APPROVE\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/technician/kycstatus",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"technician",
+										"kycstatus"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Professional Details",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"professionalSkills\": [\n        {\n            \"acType\": \"Split\",\n            \"service\": true,\n            \"repair\": true,\n            \"installation\": false\n        },\n        {\n            \"acType\": \"Window\",\n            \"service\": false,\n            \"repair\": false,\n            \"installation\": false\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/technician/professional-skill/:technicianId",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"technician",
+										"professional-skill",
+										":technicianId"
+									],
+									"variable": [
+										{
+											"key": "technicianId",
+											"value": "6900325a69f16e4700d8aa18"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "ToolBag",
+					"item": [
+						{
+							"name": "Create Tool Bag",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Technician Bag\",\n    \"description\": \"Hello\",\n    \"tools\": [\n        {\n            \"toolId\": \"688603f4d260552a80180b29\",\n            \"name\": \"Wrench\",\n            \"description\": \"description\",\n            \"quantity\": 2\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/tool-bag/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"tool-bag",
+										"create"
+									],
+									"query": [
+										{
+											"key": "toolId",
+											"value": "6829c2e1d804d7437905f402",
+											"disabled": true
+										},
+										{
+											"key": "sortby",
+											"value": "createdAt",
+											"disabled": true
+										},
+										{
+											"key": "orderby",
+											"value": "desc",
+											"disabled": true
+										},
+										{
+											"key": "startDate",
+											"value": "2024-12-20",
+											"disabled": true
+										},
+										{
+											"key": "endDate",
+											"value": "2024-12-25",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Toolbag List",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/tool-bag/list?page=1&limit=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"tool-bag",
+										"list"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add/Remove Tool From ToolBag",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"toolBagId\": \"68860c4cdd0db9e50528cfad\",\n    \"toolId\": \"688603f4d260552a80180b29\",\n    \"action\": \"add\",\n    \"name\": \"Wrench\",\n    \"quantity\": 5\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/tool-bag/modify-tool",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"tool-bag",
+										"modify-tool"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Tool Bag",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/tool-bag/delete/68860c4cdd0db9e50528cfad",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"tool-bag",
+										"delete",
+										"68860c4cdd0db9e50528cfad"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Toolbag by ID",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/tool-bag/68860c20dd0db9e50528cfa5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"tool-bag",
+										"68860c20dd0db9e50528cfa5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Toolbag by ID",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"toolBagId\": \"68860c20dd0db9e50528cfa5\",\n    \"name\": \"Technician Helper Bag\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/tool-bag/edit/68860c20dd0db9e50528cfa5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"tool-bag",
+										"edit",
+										"68860c20dd0db9e50528cfa5"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "HomeBanner",
+					"item": [
+						{
+							"name": "Edit Home Banner",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"679a09f73914c9ff5340d792\",\n    \"imageUrl\": \"https://example.com/new-image.jpg\",\n    \"destination\": \"AD\",\n    \"position\": 1,\n    \"data\": \"xyz\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/home-banner/edit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"home-banner",
+										"edit"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Banner",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"position\": \"5\",\n    \"destination\": \"COUPON\",\n    \"imageUrl\": \"value22\",\n    \"data\": \"1\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/home-banner/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"home-banner",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Banner List",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/home-banner/list",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"home-banner",
+										"list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Banner by Id",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/api/v1/admin/home-banner/delete/68bd85115f1cde3d329f6b55",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"home-banner",
+										"delete",
+										"68bd85115f1cde3d329f6b55"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Booking",
+					"item": []
+				},
+				{
+					"name": "Booking List",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/admin/booking/list?page=1&limit=10&startDate=2024-12-17&endDate=2024-12-20",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"booking",
+								"list"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "BOOKED,IN_PROGRESS",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "John",
+									"disabled": true
+								},
+								{
+									"key": "sortby",
+									"value": "createdAt",
+									"disabled": true
+								},
+								{
+									"key": "orderby",
+									"value": "desc",
+									"disabled": true
+								},
+								{
+									"key": "startDate",
+									"value": "2024-12-17"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-12-20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BrandList",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/admin/brand-list?page=3&limit=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"brand-list"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "3"
+								},
+								{
+									"key": "limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Error Codes List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/admin/error-code-list/6785594c7948f66ae6e47134?page=2&limit=20",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"error-code-list",
+								"6785594c7948f66ae6e47134"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "INVERTOR",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Brand",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"OnePlus\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/admin/brand/create-edit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"brand",
+								"create-edit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Error Code to a brand",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"errorCodeId\": \"677e7b6321b080c3375cc507\",\n    \"acType\": \"Split\",\n    \"models\": \"Y1 S2, Y6 G6\",\n    \"code\": \"O834\",\n    \"solution\": \"Restart AC\",\n    \"description\": \"Happens due to overcooling\",\n    \"category\": \"INVERTOR\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/admin/error-code/create-edit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"error-code",
+								"create-edit"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Technician",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Login",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"phoneNumber\": \"7000762503\",\n    \"countryCode\": \"+91\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/technician/login",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"technician",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Refresh Token",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2N2I5Yzc3NDJlZTY4MmEzNzIwOGRhNDIiLCJwaG9uZU51bWJlciI6IjcwMDA3NjI1MDMiLCJpYXQiOjE3NDAzMDExMDcsImV4cCI6MTc0Mzc1NzEwN30.toSkjlZbS9eXR4F87ZDfXggGArZ6BoAi1Zhwq3NZzAg\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/technician/refresh-token",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"technician",
+										"refresh-token"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "VerifyOtp",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"phoneNumber\": \"7000762503\",\n    \"otp\": \"5960\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/technician/verify-otp",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"technician",
+										"verify-otp"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Profile",
+					"item": [
+						{
+							"name": "Create Technician Profile",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Tilak Shridhar\",\n    \"secondaryContactNumber\": \"7000762588\",\n    \"email\": \"hello@gmail.com\",\n    \"dob\": \"2025-03-23T14:25:30.123Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/technician/profile",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"technician",
+										"profile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Technician By Phone",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/technician/profile",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"technician",
+										"profile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add KYC Document",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"type\": \"AADHAR_BACK\",\n    \"docUrl\": \"https://acdoctor-service-booking-system.s3.ap-south-1.amazonaws.com/dev/technician/document/irshad_DL_front.jpg\",\n    \"comment\": \"API upload from technician app\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/technician/kyc",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"technician",
+										"kyc"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get PresignedUrl For KYC Upload",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/technician/kyc-upload/image-url?fileName=profile_pic_technician_67df116c00050d662086625a.png&fileType=image/png",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"technician",
+										"kyc-upload",
+										"image-url"
+									],
+									"query": [
+										{
+											"key": "fileName",
+											"value": "profile_pic_technician_67df116c00050d662086625a.png"
+										},
+										{
+											"key": "fileType",
+											"value": "image/png"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Technician KYC Docs",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/technician/kyc",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"technician",
+										"kyc"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request KYC Review",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/technician/review-kyc",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"technician",
+										"review-kyc"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Technician",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Vijay Sharma\",\n    \"secondaryContactNumber\": \"7000762507\",\n    \"email\": \"hello@yahoo.com\",\n    \"dob\": \"2000-03-23\",\n    \"gender\": \"FEMALE\",\n    \"profilePhoto\": \"https://acdoctor-service-booking-system.s3.ap-south-1.amazonaws.com/dev/technician/document/profile_pic_technician_67df116c00050d662086625a.png\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/technician/profile",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"technician",
+										"profile"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Attendance",
+					"item": [
+						{
+							"name": "Mark Attendance",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"date\": \"2025-04-02\",\n    \"type\": \"ABSENT\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/technician/attendance",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"technician",
+										"attendance"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Attendance",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/technician/attendance?startDate=2025-04-01&endDate=2025-04-04",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"technician",
+										"attendance"
+									],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "2025-04-01"
+										},
+										{
+											"key": "endDate",
+											"value": "2025-04-04"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							"if (!pm.environment.get(\"accessToken\")) {",
+							"    pm.sendRequest({",
+							"        url: pm.environment.get(\"BASE_URL\") + \"/api/v1/technician/login\",",
+							"        method: \"POST\",",
+							"        header: { \"Content-Type\": \"application/json\" },",
+							"        body: {",
+							"            mode: \"raw\",",
+							"            raw: JSON.stringify({",
+							"                \"phoneNumber\": \"7000762503\",",
+							"                \"countryCode\": \"+91\"",
+							"            }),",
+							"        }",
+							"    }, function (err, res) {",
+							"        if (err) {",
+							"            console.log(\"Login failed:\", err);",
+							"        } else {",
+							"            let response = res.json();",
+							"            console.log(response.otp);",
+							"                // Now send OTP verification request",
+							"                pm.sendRequest({",
+							"                    url: pm.environment.get(\"BASE_URL\") + \"/api/v1/technician/verify-otp\",",
+							"                    method: \"POST\",",
+							"                    header: { \"Content-Type\": \"application/json\" },",
+							"                    body: {",
+							"                        mode: \"raw\",",
+							"                        raw: JSON.stringify({",
+							"                            \"phoneNumber\": \"7000762503\",",
+							"                            \"otp\": response.otp.toString()",
+							"                        }),",
+							"                    }",
+							"                }, function (err, otpRes) {",
+							"                    if (err) {",
+							"                        console.log(\"OTP verification failed:\", err);",
+							"                    } else {",
+							"                        let otpResponse = otpRes.json();",
+							"                        console.log(otpResponse)",
+							"                        if (otpResponse.accessToken) {",
+							"                            pm.environment.set(\"accessToken\", otpResponse.accessToken);",
+							"                            console.log(\"Access token saved:\", otpResponse.accessToken);",
+							"                        }",
+							"                    }",
+							"                });",
+							"            }",
+							"    });",
+							"}",
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
