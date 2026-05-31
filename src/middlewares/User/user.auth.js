@@ -15,6 +15,11 @@ const userAuthenticateToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.USER_SECRET);
     req.user = decoded;
+    // Compatibility: production controllers use req.user.id (string),
+    // cloned controllers use req.user._id (ObjectId string). Expose both.
+    if (decoded._id && !decoded.id) {
+      req.user.id = decoded._id.toString();
+    }
     next();
   } catch (error) {
     return res.status(403).json({
@@ -22,6 +27,18 @@ const userAuthenticateToken = (req, res, next) => {
       message: MESSAGES.INVALID_TOKEN,
     });
   }
+};
+
+/**
+ * Verifies a refresh token and returns the decoded payload.
+ * Throws if invalid or expired.
+ */
+const verifyUserRefreshToken = (token) => {
+  const decoded = jwt.verify(token, process.env.USER_SECRET);
+  if (decoded.type !== "REFRESH") {
+    throw new Error("Not a refresh token");
+  }
+  return decoded;
 };
 
 const generateUserAccessToken = (user) => {
@@ -50,6 +67,7 @@ const generateUserRefreshToken = (user) => {
 
 module.exports = {
   userAuthenticateToken,
+  verifyUserRefreshToken,
   generateUserAccessToken,
   generateUserRefreshToken,
 };

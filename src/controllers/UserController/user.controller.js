@@ -243,14 +243,16 @@ exports.login = async (req, res) => {
       await sendOTPSMS(user.phoneNumber, otp);
     }
 
-    // Include referralCode in response for frontend to display
+    // data.userId is required by the User App OTP screen:
+    // it reads res.data.data.userId to build the verify-otp payload
     return res.status(200).json({
       status: true,
       otp: isDevelopment ? otp : undefined,
       data: {
-        ...user.toObject(),
+        userId: user._id,
         referralCode: user.referralCode,
         referralEarnings: user.referralEarnings || 0,
+        address: hasAddress,
       },
       userId: user._id,
       referralCode: user.referralCode,
@@ -293,15 +295,32 @@ exports.verifyOtp = async (req, res) => {
       await User.findOne({ _id: userId }),
     );
 
+    // Issue fresh tokens — the User App reads accessToken and refreshToken
+    // directly from this response (res.data.accessToken / res.data.refreshToken)
+    const accessToken = generateUserAccessToken(findAgain);
+    const refreshToken = generateUserRefreshToken(findAgain);
+
+    await User.updateOne({ _id: userId }, { refreshToken });
+
     // Check if user has any active address
     const hasAddressAfterVerify = !!(await Address.exists({ userId: findAgain._id, isActive: 1 }));
 
     return res.status(200).json({
       status: true,
-      data: findAgain,
-      referralCode: findAgain.referralCode,
-      referralEarnings: findAgain.referralEarnings || 0,
-      address: hasAddressAfterVerify,
+      accessToken,
+      refreshToken,
+      data: {
+        userId: findAgain._id,
+        name: findAgain.name,
+        phoneNumber: findAgain.phoneNumber,
+        countryCode: findAgain.countryCode,
+        email: findAgain.email,
+        gender: findAgain.gender,
+        profilePhoto: findAgain.profilePhoto,
+        referralCode: findAgain.referralCode,
+        referralEarnings: findAgain.referralEarnings || 0,
+        address: hasAddressAfterVerify,
+      },
     });
   } else {
     return res.status(410).json({
@@ -1419,4 +1438,170 @@ exports.getActiveAppReviews = async (req, res) => {
       message: "Error fetching active reviews",
     });
   }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPATIBILITY CONTROLLERS
+// These match the Nouvak User App's expected API surface.
+// They call into existing business logic but via token-based identity instead
+// of URL-param userId, and use the production-compatible paths.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const {
+  verifyUserRefreshToken,
+} = require("../../middlewares/User/user.auth");
+
+// POST /api/v1/user/refresh
+// Request body: { refreshToken: "..." }
+// Response: { accessToken: "..." }
+exports.refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(400).json({ status: false, message: "Refresh token required" });
+    }
+
+    let decoded;
+    try {
+      decoded = verifyUserRefreshToken(refreshToken);
+    } catch {
+      return res.status(403).json({ status: false, message: "Invalid or expired refresh token" });
+    }
+
+    const user = await User.findById(decoded._id);
+    if (!user || user.refreshToken !== refreshToken) {
+      return res.status(403).json({ status: false, message: "Refresh token revoked" });
+    }
+
+    const accessToken = generateUserAccessToken(user);
+    return res.status(200).json({ status: true, accessToken });
+  } catch (error) {
+    console.error("Refresh token error:", error);
+    return res.status(500).json({ status: false, message: "Internal server error" });
+  }
+};
+
+// GET /api/v1/user/profile
+// Reads userId from JWT token (req.user._id); no URL param required.
+exports.getProfileFromToken = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    let user = await User.findById(userId).select(
+      "name phoneNumber countryCode email gender profilePhoto referralCode referralEarnings loyaltyPoints",
+    );
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+    user = await ensureUserReferralCode(user);
+    user = await User.findById(userId).select(
+      "name phoneNumber countryCode email gender profilePhoto referralCode referralEarnings loyaltyPoints",
+    );
+    return res.status(200).json({
+      status: true,
+      data: {
+        ...user.toObject(),
+        referralEarnings: user.referralEarnings || 0,
+      },
+    });
+  } catch (error) {
+    console.error("getProfileFromToken error:", error);
+    return res.status(500).json({ status: false, message: "Internal server error" });
+  }
+};
+
+// PUT /api/v1/user/update
+// Request body: { name, gender, email, profilePhoto }
+// Reads userId from JWT token.
+exports.updateProfileFromToken = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { name, gender, email, profilePhoto } = req.body;
+
+    const update = {};
+    if (name !== undefined) update.name = name;
+    if (gender !== undefined) update.gender = gender;
+    if (email !== undefined) update.email = email;
+    if (profilePhoto !== undefined) update.profilePhoto = profilePhoto;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: update },
+      { new: true },
+    ).select("name email gender profilePhoto");
+
+    if (!updatedUser) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+
+    return res.status(200).json({
+      status: true,
+      message: "Profile updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("updateProfileFromToken error:", error);
+    return res.status(500).json({ status: false, message: "Internal server error" });
+  }
+};
+
+// GET /api/v1/user/addresses
+// Reads userId from JWT token; returns { data: [...addresses] }.
+// If no addresses found, returns { error: 'No addresses found for this user' }
+// so the User App can redirect to the add-address screen.
+exports.getAddressesFromToken = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const addresses = await Address.find({ userId, isActive: 1 }).sort({ isDefault: -1, createdAt: -1 });
+
+    if (!addresses.length) {
+      return res.status(200).json({ error: "No addresses found for this user" });
+    }
+
+    return res.status(200).json({ status: true, data: addresses });
+  } catch (error) {
+    console.error("getAddressesFromToken error:", error);
+    return res.status(500).json({ status: false, message: "Internal server error" });
+  }
+};
+
+// POST /api/v1/user/address/add-edit  (slash-path alias)
+// Delegates entirely to the existing addEditAddress handler.
+exports.addEditAddressAlias = async (req, res) => {
+  return exports.addEditAddress(req, res);
+};
+
+// DELETE /api/v1/user/address/delete/:addressId
+// Soft-deletes an address. Delegates to existing userAddressDelete handler.
+exports.deleteAddressAlias = async (req, res) => {
+  return exports.userAddressDelete(req, res);
+};
+
+// GET /api/v1/user/notifications  (alias for /user/notification-list)
+exports.notificationListAlias = async (req, res) => {
+  return exports.notificationList(req, res);
+};
+
+// GET /api/v1/user/notifications/:id  (alias)
+exports.getNotificationByIdAlias = async (req, res) => {
+  return exports.getNotificationById(req, res);
+};
+
+// DELETE /api/v1/user/notifications/:id  (individual delete alias)
+exports.softDeleteNotificationAlias = async (req, res) => {
+  return exports.softDeleteNotification(req, res);
+};
+
+// DELETE /api/v1/user/notifications  (delete-all alias)
+exports.softDeleteAllNotificationsAlias = async (req, res) => {
+  return exports.softDeleteAllNotifications(req, res);
+};
+
+// PATCH /api/v1/user/notifications/check/:id  (alias — production uses PATCH)
+exports.markNotificationAsCheckedAlias = async (req, res) => {
+  return exports.markNotificationAsChecked(req, res);
+};
+
+// PATCH /api/v1/user/notifications/check-all  (alias — production uses PATCH)
+exports.markAllNotificationsAsCheckedAlias = async (req, res) => {
+  return exports.markAllNotificationsAsChecked(req, res);
 };

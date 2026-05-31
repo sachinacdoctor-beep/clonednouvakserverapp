@@ -18,6 +18,10 @@ const serviceSchema = new Schema({
     },
     key: String,
     position: { type: Number, default: -1 },
+    // Used by the Nouvak User App cart flow — price per unit for this service
+    unitPrice: { type: Number, default: 0 },
+    // Optional icon URL for dashboard/home-screen display
+    iconUrl: { type: String, default: '' },
 }, { timestamps: true });
 
 const Service = mongoose.model('Service', serviceSchema);

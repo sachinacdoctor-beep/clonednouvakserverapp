@@ -15,6 +15,7 @@ const enquiryController = require("../../controllers/EnquiryController/enquiry.c
 
 
 const {userAuthenticateToken} = require('../../middlewares/User/user.auth');
+const injectUserIdFromToken = require('../../middlewares/compatibility/injectUserIdFromToken');
 const multer = require('multer');
 
 const leadController = require('../../controllers/LeadController/lead.controller');
@@ -175,5 +176,58 @@ router.post(
 
 router.post("/user/app/review", userAuthenticateToken, userController.createOrUpdateAppReview)
 router.get("/user/app/active-reviews", userController.getActiveAppReviews)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NOUVAK USER APP COMPATIBILITY ROUTES
+// These mirror the production (TypeScript) backend's API surface so the
+// Nouvak User App can point at this backend with zero frontend changes.
+// All routes below are ADDITIVE — existing routes are untouched.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Auth
+router.post('/user/refresh', userController.refreshToken);
+
+// Resend OTP without :id param (production sends userId in body, not URL)
+router.post('/user/resend-otp', userController.resendOtp);
+
+// Profile (token-based — no userId in URL)
+router.get('/user/profile', userAuthenticateToken, userController.getProfileFromToken);
+router.put('/user/update', userAuthenticateToken, userController.updateProfileFromToken);
+
+// Addresses (token-based)
+router.get('/user/addresses', userAuthenticateToken, userController.getAddressesFromToken);
+router.post('/user/address/add-edit', userController.addEditAddress);
+router.delete('/user/address/delete/:addressId', userController.deleteAddressAlias);
+router.put('/user/address/set-default/:addressId', userAuthenticateToken, userController.setDefaultAddress);
+
+// Bookings — production-style paths (slash-separated, no userId param)
+router.post('/user/booking/add', userAuthenticateToken, bookingController.createBooking);
+// mobileBookingList expects req.params.userId — inject it from token
+router.get('/user/booking/list', userAuthenticateToken, injectUserIdFromToken, bookingController.mobileBookingList);
+router.get('/user/booking/details/:bookingId', bookingController.mobileBookingDetails);
+router.get('/user/booking/summary/:bookingId', bookingController.mobileBookingSummary);
+
+// Enquiries — production-style paths
+// getEnquiriesByUserId already falls back to req.user._id when no param present
+router.get('/user/enquiries', userAuthenticateToken, enquiryController.getEnquiriesByUserId);
+router.get('/user/enquiry/:id', userAuthenticateToken, enquiryController.getEnquiryById);
+
+// Leads — plural-path aliases
+router.post('/user/leads/create', leadController.createLeads);
+router.get('/user/leads/:leadId', leadController.userLeadDetails);
+// userLeadList expects req.params.userId — inject it from token
+router.get('/user/leads/list', userAuthenticateToken, injectUserIdFromToken, leadController.userLeadList);
+
+// Consultancy — token-based list (no :userId param)
+// userConsultancyList expects req.params.userId — inject it from token
+router.get('/user/consultancy/list', userAuthenticateToken, injectUserIdFromToken, consultancyController.userConsultancyList);
+
+// Notifications — production paths (plural) and PATCH methods
+router.get('/user/notifications', userAuthenticateToken, userController.notificationListAlias);
+router.get('/user/notifications/:id', userAuthenticateToken, userController.getNotificationByIdAlias);
+router.delete('/user/notifications/:id', userAuthenticateToken, userController.softDeleteNotificationAlias);
+router.delete('/user/notifications', userAuthenticateToken, userController.softDeleteAllNotificationsAlias);
+router.patch('/user/notifications/check/:id', userAuthenticateToken, userController.markNotificationAsCheckedAlias);
+router.patch('/user/notifications/check-all', userAuthenticateToken, userController.markAllNotificationsAsCheckedAlias);
 
 module.exports = router;    
