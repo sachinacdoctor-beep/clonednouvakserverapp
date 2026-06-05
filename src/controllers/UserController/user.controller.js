@@ -243,23 +243,15 @@ exports.login = async (req, res) => {
       await sendOTPSMS(user.phoneNumber, otp);
     }
 
-    // data.userId is required by the User App OTP screen:
-    // it reads res.data.data.userId to build the verify-otp payload
+    // Match production (nouvakserverapp) loginRegisterUser response exactly.
+    // User App OTP screen reads res.data.data.userId, so userId must be in data.
     return res.status(200).json({
       status: true,
-      otp: isDevelopment ? otp : undefined,
+      message: "OTP sent successfully",
       data: {
         userId: user._id,
-        referralCode: user.referralCode,
-        referralEarnings: user.referralEarnings || 0,
-        address: hasAddress,
+        ...(isDevelopment && { otp }),
       },
-      userId: user._id,
-      referralCode: user.referralCode,
-      referralEarnings: user.referralEarnings || 0,
-      accessToken,
-      refreshToken,
-      address: hasAddress,
     });
   } catch (error) {
     console.error("Login Error:", error);
@@ -295,32 +287,21 @@ exports.verifyOtp = async (req, res) => {
       await User.findOne({ _id: userId }),
     );
 
-    // Issue fresh tokens — the User App reads accessToken and refreshToken
-    // directly from this response (res.data.accessToken / res.data.refreshToken)
+    // Issue fresh tokens
     const accessToken = generateUserAccessToken(findAgain);
     const refreshToken = generateUserRefreshToken(findAgain);
 
     await User.updateOne({ _id: userId }, { refreshToken });
 
-    // Check if user has any active address
-    const hasAddressAfterVerify = !!(await Address.exists({ userId: findAgain._id, isActive: 1 }));
-
+    // Match production (nouvakserverapp) verifyOtp response exactly:
+    // { success, message, accessToken, refreshToken, user }
+    // User App reads res.data.accessToken and res.data.refreshToken directly.
     return res.status(200).json({
-      status: true,
+      success: true,
+      message: "OTP verified, user activated",
       accessToken,
       refreshToken,
-      data: {
-        userId: findAgain._id,
-        name: findAgain.name,
-        phoneNumber: findAgain.phoneNumber,
-        countryCode: findAgain.countryCode,
-        email: findAgain.email,
-        gender: findAgain.gender,
-        profilePhoto: findAgain.profilePhoto,
-        referralCode: findAgain.referralCode,
-        referralEarnings: findAgain.referralEarnings || 0,
-        address: hasAddressAfterVerify,
-      },
+      user: findAgain,
     });
   } else {
     return res.status(410).json({
@@ -1474,15 +1455,53 @@ exports.refreshToken = async (req, res) => {
     }
 
     const accessToken = generateUserAccessToken(user);
-    return res.status(200).json({ status: true, accessToken });
+    // Match production: { success: true, accessToken }
+    return res.status(200).json({ success: true, accessToken });
   } catch (error) {
     console.error("Refresh token error:", error);
-    return res.status(500).json({ status: false, message: "Internal server error" });
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// POST /api/v1/user/resend-otp  (no :id param — production reads userId from body)
+// Production response: { success: true, message: "OTP resent successfully" }
+exports.resendOtpFromBody = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "userId is required" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const isDevelopment = process.env.NODE_ENV === "development";
+    const isDemoNumber = user.phoneNumber === process.env.PHONE_NUMBER;
+    const { generateRandom4Digit, sendOTPSMS } = require("../../Utils/common");
+
+    const otp = isDevelopment || isDemoNumber
+      ? process.env.DEMO_OTP || "1111"
+      : generateRandom4Digit();
+
+    user.otp = otp;
+    user.otpExpiryTime = Date.now() + 2 * 60 * 1000;
+    await user.save();
+
+    if (!isDevelopment && !isDemoNumber) {
+      await sendOTPSMS(user.phoneNumber, otp);
+    }
+
+    return res.status(200).json({ success: true, message: "OTP resent successfully" });
+  } catch (error) {
+    console.error("resendOtpFromBody error:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
 // GET /api/v1/user/profile
-// Reads userId from JWT token (req.user._id); no URL param required.
+// Match production getUserById: { success: true, data: userObject }
 exports.getProfileFromToken = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -1490,35 +1509,30 @@ exports.getProfileFromToken = async (req, res) => {
       "name phoneNumber countryCode email gender profilePhoto referralCode referralEarnings loyaltyPoints",
     );
     if (!user) {
-      return res.status(404).json({ status: false, message: "User not found" });
+      return res.status(404).json({ success: false, error: "User not found" });
     }
     user = await ensureUserReferralCode(user);
     user = await User.findById(userId).select(
       "name phoneNumber countryCode email gender profilePhoto referralCode referralEarnings loyaltyPoints",
     );
-    return res.status(200).json({
-      status: true,
-      data: {
-        ...user.toObject(),
-        referralEarnings: user.referralEarnings || 0,
-      },
-    });
+    return res.status(200).json({ success: true, data: user });
   } catch (error) {
     console.error("getProfileFromToken error:", error);
-    return res.status(500).json({ status: false, message: "Internal server error" });
+    return res.status(500).json({ success: false, error: String(error) });
   }
 };
 
 // PUT /api/v1/user/update
-// Request body: { name, gender, email, profilePhoto }
-// Reads userId from JWT token.
+// Match production updateUser: { success: true, message: "User updated", data: user }
 exports.updateProfileFromToken = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { name, gender, email, profilePhoto } = req.body;
+    // Accept both production field names and existing cloned field names
+    const { name, gender, email, profilePhoto, userName } = req.body;
 
     const update = {};
     if (name !== undefined) update.name = name;
+    if (userName !== undefined) update.name = userName; // cloned field name
     if (gender !== undefined) update.gender = gender;
     if (email !== undefined) update.email = email;
     if (profilePhoto !== undefined) update.profilePhoto = profilePhoto;
@@ -1530,44 +1544,90 @@ exports.updateProfileFromToken = async (req, res) => {
     ).select("name email gender profilePhoto");
 
     if (!updatedUser) {
-      return res.status(404).json({ status: false, message: "User not found" });
+      return res.status(400).json({ success: false, error: "User not found" });
     }
 
-    return res.status(200).json({
-      status: true,
-      message: "Profile updated successfully",
-      data: updatedUser,
-    });
+    return res.status(200).json({ success: true, message: "User updated", data: updatedUser });
   } catch (error) {
     console.error("updateProfileFromToken error:", error);
-    return res.status(500).json({ status: false, message: "Internal server error" });
+    return res.status(400).json({ success: false, error: String(error) });
   }
 };
 
 // GET /api/v1/user/addresses
-// Reads userId from JWT token; returns { data: [...addresses] }.
-// If no addresses found, returns { error: 'No addresses found for this user' }
-// so the User App can redirect to the add-address screen.
+// Match production userActiveAddresses response:
+//   Success: { success: true, message, data: [...], count, phoneNumber }
+//   No addresses: { success: false, message, data: [] }
+// Also includes `error` field for User App compatibility
+// (useCartScreen.js checks res.data.error === 'No addresses found for this user')
 exports.getAddressesFromToken = async (req, res) => {
   try {
     const userId = req.user._id;
     const addresses = await Address.find({ userId, isActive: 1 }).sort({ isDefault: -1, createdAt: -1 });
 
     if (!addresses.length) {
-      return res.status(200).json({ error: "No addresses found for this user" });
+      return res.status(200).json({
+        success: false,
+        message: "No addresses found for this user",
+        // Keep `error` field so User App (useCartScreen.js) redirects correctly
+        error: "No addresses found for this user",
+        data: [],
+      });
     }
 
-    return res.status(200).json({ status: true, data: addresses });
+    const user = await User.findById(userId).select("phoneNumber");
+
+    return res.status(200).json({
+      success: true,
+      message: "Addresses fetched successfully",
+      data: addresses,
+      count: addresses.length,
+      phoneNumber: user ? user.phoneNumber : undefined,
+    });
   } catch (error) {
     console.error("getAddressesFromToken error:", error);
-    return res.status(500).json({ status: false, message: "Internal server error" });
+    return res.status(500).json({ success: false, message: "Internal server error", error: String(error) });
   }
 };
 
-// POST /api/v1/user/address/add-edit  (slash-path alias)
-// Delegates entirely to the existing addEditAddress handler.
-exports.addEditAddressAlias = async (req, res) => {
-  return exports.addEditAddress(req, res);
+// POST /api/v1/user/address/add-edit
+// Accepts production field names (houseNumber, zipCode, ownerName) and maps to
+// cloned DB field names (house, zipcode). Reads userId from token.
+exports.addEditAddressCompat = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    // Support both production field names and cloned field names
+    const {
+      addressId,
+      houseNumber, house,         // production vs cloned
+      street,
+      city,
+      state,
+      zipCode, zipcode,           // production vs cloned
+      landmark,
+      saveAs,
+      ownerName,                  // production only
+      isDefault,
+    } = req.body;
+
+    const resolvedHouse = houseNumber || house;
+    const resolvedZip   = zipCode || zipcode;
+
+    if (!resolvedHouse || !street || !city || !state || !resolvedZip) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
+    // Inject userId and normalised fields back into body so the existing
+    // addEditAddress controller can handle the DB write unchanged.
+    req.body.userId  = userId.toString();
+    req.body.house   = resolvedHouse;
+    req.body.zipcode = resolvedZip;
+
+    return exports.addEditAddress(req, res);
+  } catch (error) {
+    console.error("addEditAddressCompat error:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
 };
 
 // DELETE /api/v1/user/address/delete/:addressId
