@@ -4,6 +4,15 @@ const Admin = require("../../models/Admin/admin.model");
 const Address = require("../../models/User/address.model");
 const jwt = require("jsonwebtoken");
 const { STATUS, MESSAGES, CODES } = require("../../Config/responseConstants");
+const {
+  ADMIN_ROLES,
+  TRAINEE_DEPARTMENTS,
+  normalizeRole,
+  normalizeDepartment,
+  buildPermissionPayload,
+  resolvePermissions,
+  ALL_MODULES,
+} = require("../../Config/adminRoles");
 const User = require("../../models/User/user.model");
 const { Types } = require("mongoose");
 const { getFolderPath } = require("../../Utils/common");
@@ -3852,4 +3861,262 @@ exports.deleteAppReview = async (req, res) => {
       message: "Error deleting review",
     });
   }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ADMIN STAFF MANAGEMENT
+// These endpoints exist in acdoctorserverapp and are added here for parity.
+// Only FOUNDER-role admins can create / update / reset staff accounts.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const assertFounderAccess = (req, res) => {
+  const role = normalizeRole(req.admin?.role, req.admin?.type);
+  if (role !== ADMIN_ROLES.FOUNDER) {
+    res.status(CODES.FORBIDDEN || 403).json({
+      status: STATUS.FAIL,
+      message: 'Only founders can manage admin users.',
+    });
+    return false;
+  }
+  return true;
+};
+
+const sanitizePermissionModules = (modules = {}) => {
+  const sanitizeList = (list) => {
+    if (!Array.isArray(list)) return [];
+    if (list.includes('*')) return ['*'];
+    return list.filter((item) => ALL_MODULES.includes(item));
+  };
+  return {
+    view:   sanitizeList(modules.view),
+    create: sanitizeList(modules.create),
+    edit:   sanitizeList(modules.edit),
+    delete: sanitizeList(modules.delete),
+  };
+};
+
+// GET /api/v1/admin/staff/list
+exports.listAdminStaff = async (req, res) => {
+  try {
+    const staff = await Admin.find()
+      .select('-password -refreshToken')
+      .sort({ createdAt: -1 });
+
+    const data = staff.map((member) => {
+      const role = normalizeRole(member.role, member.type);
+      const department =
+        role === ADMIN_ROLES.TRAINEE ? normalizeDepartment(member.department) : null;
+      const memberObj = member.toObject();
+      return {
+        ...memberObj,
+        role,
+        department,
+        resolvedPermissions: resolvePermissions(member),
+        defaultPermissions: buildPermissionPayload(role, department),
+      };
+    });
+
+    return res.status(CODES.SUCCESS).json({
+      status: STATUS.SUCCESS,
+      data,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(CODES.SERVER_ERROR).json({
+      status: STATUS.FAIL,
+      message: MESSAGES.SERVER_ERROR,
+    });
+  }
+};
+
+// POST /api/v1/admin/staff/create
+exports.createAdminStaff = async (req, res) => {
+  try {
+    const { name, email, password, role, department } = req.body;
+
+    if (!name || !email || !password || !role) {
+      return res.status(CODES.BAD_REQUEST).json({
+        status: STATUS.FAIL,
+        message: 'Name, email, password and role are required.',
+      });
+    }
+
+    const normalizedRole = normalizeRole(role);
+    const normalizedDepartment =
+      normalizedRole === ADMIN_ROLES.TRAINEE
+        ? normalizeDepartment(department)
+        : null;
+
+    if (
+      normalizedRole === ADMIN_ROLES.TRAINEE &&
+      !Object.values(TRAINEE_DEPARTMENTS).includes(normalizedDepartment)
+    ) {
+      return res.status(CODES.BAD_REQUEST).json({
+        status: STATUS.FAIL,
+        message: 'Trainee department is required.',
+      });
+    }
+
+    const existing = await Admin.findOne({
+      email: { $regex: new RegExp(`^${email}$`, 'i') },
+    });
+    if (existing) {
+      return res.status(CODES.BAD_REQUEST).json({
+        status: STATUS.FAIL,
+        message: 'Email is already registered',
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const created = await Admin.create({
+      name,
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      role: normalizedRole,
+      department: normalizedDepartment,
+      type: normalizedRole === ADMIN_ROLES.FOUNDER ? 5 : 1,
+    });
+
+    return res.status(CODES.CREATED).json({
+      status: STATUS.SUCCESS,
+      message: 'Admin user created successfully',
+      data: {
+        _id: created._id,
+        name: created.name,
+        email: created.email,
+        role: created.role,
+        department: created.department,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(CODES.SERVER_ERROR).json({
+      status: STATUS.FAIL,
+      message: MESSAGES.SERVER_ERROR,
+    });
+  }
+};
+
+// PATCH /api/v1/admin/staff/:id
+exports.updateAdminStaff = async (req, res) => {
+  try {
+    if (!assertFounderAccess(req, res)) return;
+
+    const { id } = req.params;
+    const { name, role, department } = req.body;
+
+    const adminUser = await Admin.findById(id);
+    if (!adminUser) {
+      return res.status(CODES.NOT_FOUND || 404).json({
+        status: STATUS.FAIL,
+        message: 'Admin user not found.',
+      });
+    }
+
+    if (name?.trim()) adminUser.name = name.trim();
+
+    if (role) {
+      const normalizedRole = normalizeRole(role);
+      adminUser.role = normalizedRole;
+      adminUser.type = normalizedRole === ADMIN_ROLES.FOUNDER ? 5 : 1;
+      adminUser.department =
+        normalizedRole === ADMIN_ROLES.TRAINEE
+          ? normalizeDepartment(department)
+          : null;
+    }
+
+    await adminUser.save();
+
+    const resolvedRole = normalizeRole(adminUser.role, adminUser.type);
+    const resolvedDepartment =
+      resolvedRole === ADMIN_ROLES.TRAINEE
+        ? normalizeDepartment(adminUser.department)
+        : null;
+
+    return res.status(CODES.SUCCESS).json({
+      status: STATUS.SUCCESS,
+      message: 'Admin user updated successfully',
+      data: {
+        _id: adminUser._id,
+        name: adminUser.name,
+        email: adminUser.email,
+        role: resolvedRole,
+        department: resolvedDepartment,
+        useCustomPermissions: Boolean(adminUser.useCustomPermissions),
+        customPermissions: adminUser.customPermissions,
+        resolvedPermissions: resolvePermissions(adminUser),
+        defaultPermissions: buildPermissionPayload(resolvedRole, resolvedDepartment),
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(CODES.SERVER_ERROR).json({
+      status: STATUS.FAIL,
+      message: MESSAGES.SERVER_ERROR,
+    });
+  }
+};
+
+// PUT /api/v1/admin/staff/:id/permissions
+exports.updateAdminStaffPermissions = async (req, res) => {
+  try {
+    if (!assertFounderAccess(req, res)) return;
+
+    const { id } = req.params;
+    const { modules, useCustomPermissions } = req.body;
+
+    const adminUser = await Admin.findById(id);
+    if (!adminUser) {
+      return res.status(CODES.NOT_FOUND || 404).json({
+        status: STATUS.FAIL,
+        message: 'Admin user not found.',
+      });
+    }
+
+    if (useCustomPermissions === false) {
+      adminUser.useCustomPermissions = false;
+      adminUser.customPermissions = {
+        modules: { view: [], create: [], edit: [], delete: [] },
+      };
+    } else {
+      adminUser.useCustomPermissions = true;
+      adminUser.customPermissions = {
+        modules: sanitizePermissionModules(modules),
+      };
+    }
+
+    await adminUser.save();
+
+    const resolvedRole = normalizeRole(adminUser.role, adminUser.type);
+    const resolvedDepartment =
+      resolvedRole === ADMIN_ROLES.TRAINEE
+        ? normalizeDepartment(adminUser.department)
+        : null;
+
+    return res.status(CODES.SUCCESS).json({
+      status: STATUS.SUCCESS,
+      message: adminUser.useCustomPermissions
+        ? 'Custom permissions saved successfully'
+        : 'Permissions reset to role default',
+      data: {
+        _id: adminUser._id,
+        useCustomPermissions: Boolean(adminUser.useCustomPermissions),
+        customPermissions: adminUser.customPermissions,
+        resolvedPermissions: resolvePermissions(adminUser),
+        defaultPermissions: buildPermissionPayload(resolvedRole, resolvedDepartment),
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(CODES.SERVER_ERROR).json({
+      status: STATUS.FAIL,
+      message: MESSAGES.SERVER_ERROR,
+    });
+  }
+};
+
+// POST /api/v1/admin/staff/:id/permissions/reset
+exports.resetAdminStaffPermissions = async (req, res) => {
+  req.body = { useCustomPermissions: false };
+  return exports.updateAdminStaffPermissions(req, res);
 };

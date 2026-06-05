@@ -17,7 +17,25 @@ const adminSchema = new mongoose.Schema({
         type: Number
     },
     role: {
-        type: String
+        type: String,
+        default: 'FOUNDER',
+    },
+    department: {
+        type: String,
+        enum: ['MARKETING_SALES', 'SERVICE_OPS', null],
+        default: null,
+    },
+    useCustomPermissions: {
+        type: Boolean,
+        default: false,
+    },
+    customPermissions: {
+        modules: {
+            view:   { type: [String], default: [] },
+            create: { type: [String], default: [] },
+            edit:   { type: [String], default: [] },
+            delete: { type: [String], default: [] },
+        },
     },
     refreshToken: {
         type: String,

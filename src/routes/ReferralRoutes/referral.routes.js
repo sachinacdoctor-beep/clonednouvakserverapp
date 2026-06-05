@@ -43,7 +43,7 @@ router.get("/user/referral/pending", userAuthenticateToken, getPendingReferrals)
 router.get("/admin/referral/:referralId", getReferralById);
 
 // Manually process referral reward (for background jobs or manual processing)
-router.post("admin/referral/:referralId/process-reward", processReferralRewardManual);
+router.post("/admin/referral/:referralId/process-reward", processReferralRewardManual);
 
 router.get("/admin/referrals", getAllReferrals);
 
