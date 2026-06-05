@@ -2,7 +2,7 @@ const axios = require("axios");
 const qs = require("qs");
 
 function generateRandom4Digit() {
-  return Math.floor(1000 + Math.random() * 9000);
+  return JSON.stringify(Math.floor(1000 + Math.random() * 9000));
 }
 
 function getFolderPath(type) {
