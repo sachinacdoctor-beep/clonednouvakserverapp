@@ -68,8 +68,11 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["MALE", "FEMALE", "OTHER"],
-      default: null,
+      // null is explicitly allowed so new users (no gender set) pass validation.
+      // The setter converts "" to null so empty strings from clients never fail.
+      enum: ["MALE", "FEMALE", "OTHER", ""],
+      // set: (v) => (v === "" ? null : v),
+      default: "",
       required: false,
     },
     profilePhoto: {
