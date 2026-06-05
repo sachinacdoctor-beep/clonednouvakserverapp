@@ -24,7 +24,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // User APIs
 router.post('/user/login', loginUser, userController.login);
 
-router.post('/user/verify-otp', userAuthenticateToken, verifyOTPUser, userController.verifyOtp);
+router.post('/user/verify-otp', verifyOTPUser, userController.verifyOtp);
 
 // router.post('/user/resend-otp', resendOTPUser, userController.resendOtp);
 
@@ -187,17 +187,17 @@ router.get("/user/app/active-reviews", userController.getActiveAppReviews)
 // Auth
 router.post('/user/refresh', userController.refreshToken);
 
-// Resend OTP without :id param (production sends userId in body, not URL)
-router.post('/user/resend-otp', userController.resendOtp);
+// Resend OTP — production reads userId from body, not URL param
+router.post('/user/resend-otp', userController.resendOtpFromBody);
 
 // Profile (token-based — no userId in URL)
 router.get('/user/profile', userAuthenticateToken, userController.getProfileFromToken);
 router.put('/user/update', userAuthenticateToken, userController.updateProfileFromToken);
 
-// Addresses (token-based)
+// Addresses (token-based, with production field name mapping)
 router.get('/user/addresses', userAuthenticateToken, userController.getAddressesFromToken);
-router.post('/user/address/add-edit', userController.addEditAddress);
-router.delete('/user/address/delete/:addressId', userController.deleteAddressAlias);
+router.post('/user/address/add-edit', userAuthenticateToken, userController.addEditAddressCompat);
+router.delete('/user/address/delete/:addressId', userAuthenticateToken, userController.deleteAddressAlias);
 router.put('/user/address/set-default/:addressId', userAuthenticateToken, userController.setDefaultAddress);
 
 // Bookings — production-style paths (slash-separated, no userId param)

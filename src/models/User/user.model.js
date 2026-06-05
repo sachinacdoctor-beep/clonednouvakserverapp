@@ -28,8 +28,8 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     otp: {
-      type: Number,
-      default: 1234,
+      type: String,
+      default: "1111",
     },
     otpExpiryTime: {
       type: String,
