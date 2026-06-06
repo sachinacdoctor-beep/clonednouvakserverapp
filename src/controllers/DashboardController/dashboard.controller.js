@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const DashboardItem = require('../../models/Dashboard/dashboardItem.model');
+const { STATUS, MESSAGES, CODES } = require('../../Config/responseConstants');
+const dashboardService = require('../../services/Dashboard/dashboard.service');
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
@@ -193,5 +195,33 @@ exports.deleteDashboardItem = async (req, res) => {
   } catch (error) {
     console.error('deleteDashboardItem error:', error);
     return res.status(500).json({ success: false, message: 'Failed to delete item', error: error.message });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GET /api/v1/admin/dashboard/stats?period=weekly&taskMetric=bookings
+// Returns aggregated platform statistics for the Admin dashboard.
+// Mirrors acdoctorserverapp DashboardController.getDashboardStats exactly.
+// ─────────────────────────────────────────────────────────────────────────────
+
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const period     = req.query.period     === 'monthly'   ? 'monthly'   : 'weekly';
+    const taskMetric = req.query.taskMetric === 'enquiries' ? 'enquiries' : 'bookings';
+
+    const data = await dashboardService.getDashboardData({ period, taskMetric });
+
+    return res.status(CODES.SUCCESS).json({
+      status: STATUS.SUCCESS,
+      message: 'Dashboard stats fetched successfully',
+      data,
+    });
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    return res.status(CODES.SERVER_ERROR).json({
+      status: STATUS.FAIL,
+      message: MESSAGES.SERVER_ERROR,
+      error: error.message,
+    });
   }
 };

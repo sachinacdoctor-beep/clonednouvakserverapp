@@ -598,5 +598,19 @@ router.delete(
   adminController.deleteAppReview,
 );
 
+// ── Admin Staff Management (missing from original cloned — added from acdoctorserverapp)
+router.get("/admin/staff/list", adminController.listAdminStaff);
+router.post("/admin/staff/create", adminController.createAdminStaff);
+router.patch("/admin/staff/:id", adminController.updateAdminStaff);
+router.put("/admin/staff/:id/permissions", adminController.updateAdminStaffPermissions);
+router.post("/admin/staff/:id/permissions/reset", adminController.resetAdminStaffPermissions);
+
+// ── Dashboard Stats (missing from original cloned — added from acdoctorserverapp)
+const dashboardController = require("../../controllers/DashboardController/dashboard.controller");
+router.get(
+  "/admin/dashboard/stats",
+  adminAuthenticateToken,
+  dashboardController.getDashboardStats,
+);
 
 module.exports = router;

@@ -46,6 +46,12 @@ router.post("/technician/refresh-token", TechnicianController.refreshToken);
 router.post("/technician/request-deletion", authenticateTechnicianToken, TechnicianController.requestAccountDeletion);
 
 // Profile
+// acdoctorserverapp uses /technician/profile/:technicianId — kept as alias
+router.get(
+  "/technician/profile/:technicianId",
+  authenticateTechnicianToken,
+  TechnicianController.getTechnicianProfile,
+);
 router.get(
   "/technician/profile-detail/:technicianId",
   authenticateTechnicianToken,
